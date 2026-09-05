@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
+  <title>Stardust X · modern messaging</title>
+  <!-- Open Graph / SEO -->
+  <meta property="og:title" content="Stardust X – Connect. Chat. Share." />
+  <meta property="og:description" content="A beautifully simple messaging experience designed to keep you connected." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#D0E6D4" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%23D0E6D4'/><circle cx='50' cy='50' r='28' fill='%23F9FAF7'/><circle cx='50' cy='50' r='14' fill='%2374B58D'/></svg>" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #F9FAF7;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      color: #1C2A22;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+
+    /* soft mint palette */
+    :root {
+      --mint-soft: #D0E6D4;
+      --mint-light: #E2EFE4;
+      --mint-bg: #F9FAF7;
+      --mint-green: #A8D0B5;
+      --mint-medium: #74B58D;
+      --mint-dark: #29463A;
+      --shadow-subtle: 0 12px 30px rgba(41, 70, 58, 0.06), 0 4px 12px rgba(41, 70, 58, 0.04);
+      --radius-card: 24px;
+      --radius-pill: 80px;
+    }
+
+    h1, h2, h3 {
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* ----- NAVIGATION (sticky, premium) ----- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px) saturate(1.1);
+      -webkit-backdrop-filter: blur(12px) saturate(1.1);
+      background: rgba(249, 250, 247, 0.7);
+      border-bottom: 1px solid rgba(208, 230, 212, 0.3);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .nav-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      color: var(--mint-dark);
+    }
+    .nav-logo svg {
+      width: 32px;
+      height: 32px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.2rem;
+      align-items: center;
+      font-size: 0.95rem;
+      font-weight: 450;
+    }
+    .nav-links a {
+      color: #2b3f36;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a:hover {
+      color: var(--mint-dark);
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--mint-medium);
+      transition: width 0.25s;
+    }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    .cta-nav {
+      background: linear-gradient(145deg, #D0E6D4, #b8d4be);
+      padding: 8px 24px;
+      border-radius: var(--radius-pill);
+      font-weight: 500;
+      color: var(--mint-dark);
+      box-shadow: 0 2px 6px rgba(116, 181, 141, 0.2);
+      transition: all 0.2s;
+    }
+    .cta-nav:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(116, 181, 141, 0.25);
+      background: linear-gradient(145deg, #c8dfcc, #aacfb2);
+    }
+    /* mobile hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .hamburger span {
+      width: 28px;
+      height: 2.5px;
+      background: var(--mint-dark);
+      border-radius: 4px;
+      transition: 0.25s;
+    }
+
+    /* mobile nav drawer */
+    .mobile-drawer {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(249, 250, 247, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 200;
+      flex-direction: column;
+      padding: 80px 32px 40px;
+      gap: 28px;
+      font-size: 1.6rem;
+      font-weight: 400;
+      transition: opacity 0.3s;
+    }
+    .mobile-drawer.open {
+      display: flex;
+    }
+    .mobile-drawer a {
+      border-bottom: 1px solid rgba(208, 230, 212, 0.3);
+      padding-bottom: 14px;
+      color: var(--mint-dark);
+    }
+    .mobile-drawer .cta-nav {
+      align-self: flex-start;
+      font-size: 1.1rem;
+      padding: 12px 32px;
+    }
+    .close-drawer {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      font-size: 2rem;
+      background: none;
+      border: none;
+      color: var(--mint-dark);
+      cursor: pointer;
+    }
+
+    @media (max-width: 820px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-inner { padding: 12px 20px; }
+    }
+
+    /* ----- HERO ----- */
+    .hero {
+      position: relative;
+      min-height: 92vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: 40px 24px;
+      background: #F9FAF7;
+    }
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.55;
+      filter: saturate(0.9) contrast(1.05);
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 70% 30%, rgba(249, 250, 247, 0.3) 0%, rgba(249, 250, 247, 0.6) 80%);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(208, 230, 212, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding: 6px 22px;
+      border-radius: var(--radius-pill);
+      font-size: 0.7rem;
+      letter-spacing: 1.8px;
+      font-weight: 500;
+      color: var(--mint-dark);
+      border: 1px solid rgba(116, 181, 141, 0.15);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(3rem, 12vw, 5.2rem);
+      font-weight: 520;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--mint-dark);
+      margin-bottom: 16px;
+    }
+    .hero h1 span {
+      background: linear-gradient(145deg, #29463A, #74B58D);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 1.3rem;
+      color: #3a5a4c;
+      max-width: 520px;
+      margin: 0 auto 32px;
+      font-weight: 380;
+      letter-spacing: -0.01em;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px 20px;
+      margin-bottom: 28px;
+    }
+    .btn-primary {
+      background: linear-gradient(145deg, #D0E6D4, #b2cfb9);
+      padding: 14px 42px;
+      border-radius: var(--radius-pill);
+      font-weight: 500;
+      font-size: 1.05rem;
+      color: var(--mint-dark);
+      box-shadow: 0 6px 18px rgba(116, 181, 141, 0.2);
+      transition: all 0.25s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(116, 181, 141, 0.25);
+    }
+    .btn-secondary {
+      background: transparent;
+      padding: 14px 32px;
+      border-radius: var(--radius-pill);
+      font-weight: 450;
+      font-size: 1.05rem;
+      color: var(--mint-dark);
+      border: 1px solid rgba(116, 181, 141, 0.3);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      background: rgba(208, 230, 212, 0.25);
+      border-color: var(--mint-medium);
+    }
+    .hero-sub-line {
+      color: #4b6b5b;
+      font-size: 0.95rem;
+      letter-spacing: 1.2px;
+      font-weight: 380;
+    }
+    .hero-icon-float {
+      position: absolute;
+      z-index: 2;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+    .float-orb {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #E2EFE4, #A8D0B5);
+      box-shadow: 0 20px 50px rgba(116, 181, 141, 0.2);
+      position: absolute;
+    }
+    .float-orb:nth-child(1) { top: 12%; left: 6%; width: 50px; height: 50px; }
+    .float-orb:nth-child(2) { bottom: 18%; right: 5%; width: 80px; height: 80px; opacity: 0.2; }
+    .float-orb:nth-child(3) { top: 40%; right: 8%; width: 40px; height: 40px; opacity: 0.2; }
+
+    @media (max-width: 640px) {
+      .hero { min-height: 80vh; padding: 20px 16px; }
+      .hero h1 { font-size: 2.8rem; }
+      .hero p { font-size: 1.1rem; }
+      .float-orb { display: none; }
+    }
+
+    /* ----- section base ----- */
+    section {
+      padding: 80px 24px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .section-title {
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 480;
+      letter-spacing: -0.02em;
+      color: var(--mint-dark);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .section-sub {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #4b6b5b;
+      max-width: 600px;
+      margin: 0 auto 48px;
+    }
+
+    /* ----- APP PREVIEW (phones) ----- */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 28px;
+      margin-top: 20px;
+    }
+    .phone-frame {
+      background: #ffffff;
+      border-radius: 32px;
+      padding: 12px 8px 8px;
+      box-shadow: var(--shadow-subtle);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(208, 230, 212, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .phone-frame:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 48px rgba(41, 70, 58, 0.08);
+    }
+    .phone-frame img {
+      width: 100%;
+      max-width: 180px;
+      height: auto;
+      border-radius: 18px;
+      display: block;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .phone-caption {
+      margin-top: 12px;
+      font-weight: 450;
+      color: var(--mint-dark);
+      font-size: 0.9rem;
+    }
+
+    /* ----- FEATURES (cards) ----- */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 32px;
+      margin-top: 12px;
+    }
+    .feature-card {
+      background: #ffffff;
+      border-radius: var(--radius-card);
+      padding: 32px 24px 28px;
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(208, 230, 212, 0.25);
+      transition: all 0.3s;
+      text-align: center;
+    }
+    .feature-card:hover {
+      transform: scale(1.01);
+      border-color: var(--mint-green);
+    }
+    .feature-card h3 {
+      font-size: 1.3rem;
+      font-weight: 460;
+      color: var(--mint-dark);
+      margin-bottom: 6px;
+    }
+    .feature-card p {
+      color: #3f5f50;
+      font-size: 0.95rem;
+    }
+    .feature-card .emoji-big {
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+
+    /* ----- interactive app experience (desktop) ----- */
+    .interactive-row {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 40px 0;
+    }
+    .interactive-phone {
+      flex: 1 1 280px;
+      max-width: 340px;
+    }
+    .interactive-phone img {
+      width: 100%;
+      border-radius: 32px;
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(208, 230, 212, 0.2);
+    }
+    .interactive-desc {
+      flex: 1 1 300px;
+    }
+    .interactive-desc h3 {
+      font-size: 2rem;
+      font-weight: 450;
+      color: var(--mint-dark);
+    }
+    .interactive-desc p {
+      color: #3f5f50;
+      margin: 16px 0 8px;
+      font-size: 1.05rem;
+    }
+    .interactive-desc ul {
+      list-style: none;
+      padding: 0;
+    }
+    .interactive-desc li {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(208, 230, 212, 0.2);
+      color: #2b4a3a;
+      font-weight: 400;
+    }
+
+    /* splash section */
+    .splash-section {
+      background: var(--mint-light);
+      border-radius: 60px;
+      padding: 60px 40px;
+      margin: 40px auto;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .splash-section .splash-phone {
+      max-width: 260px;
+      margin: 0 auto;
+      display: block;
+      border-radius: 40px;
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    .splash-curve {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(168, 208, 181, 0.15);
+      width: 300px;
+      height: 300px;
+      top: -80px;
+      right: -80px;
+      pointer-events: none;
+    }
+    .splash-curve2 {
+      bottom: -100px;
+      left: -100px;
+      width: 400px;
+      height: 400px;
+      background: rgba(116, 181, 141, 0.08);
+    }
+
+    /* download */
+    .download-section {
+      background: linear-gradient(135deg, #E2EFE4 0%, #D0E6D4 100%);
+      border-radius: 60px;
+      padding: 64px 40px;
+      text-align: center;
+      margin: 40px auto;
+      box-shadow: var(--shadow-subtle);
+    }
+    .download-section h2 {
+      font-size: 2.4rem;
+      font-weight: 450;
+      color: var(--mint-dark);
+    }
+    .download-section p {
+      font-size: 1.1rem;
+      color: #2b4a3a;
+      margin: 12px 0 32px;
+    }
+    .download-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    /* about */
+    .about-mini {
+      background: white;
+      border-radius: var(--radius-card);
+      padding: 40px 32px;
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid rgba(208, 230, 212, 0.2);
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .about-mini p {
+      color: #2f4d3e;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    /* footer */
+    footer {
+      background: #F9FAF7;
+      border-top: 1px solid rgba(208, 230, 212, 0.4);
+      padding: 40px 24px 24px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .footer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 32px;
+    }
+    .footer-brand {
+      font-weight: 450;
+      font-size: 1.1rem;
+      color: var(--mint-dark);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px 32px;
+    }
+    .footer-links a {
+      color: #3f5f50;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--mint-dark); }
+    .footer-bottom {
+      margin-top: 28px;
+      font-size: 0.8rem;
+      color: #6b8b7a;
+      text-align: center;
+      border-top: 1px solid rgba(208, 230, 212, 0.2);
+      padding-top: 20px;
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .preview-grid { grid-template-columns: repeat(2, 1fr); }
+      .interactive-row { flex-direction: column; text-align: center; }
+      .splash-section { padding: 40px 20px; }
+      .download-section { padding: 40px 20px; }
+      .download-section h2 { font-size: 1.9rem; }
+    }
+    @media (max-width: 440px) {
+      .preview-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .phone-frame img { max-width: 140px; }
+    }
+
+    /* animations (fade-up) */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.3, 1), transform 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .fade-up { opacity: 1; transform: none; transition: none; }
+      .phone-frame:hover { transform: none; }
+      .btn-primary:hover { transform: none; }
+      .cta-nav:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-left">
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="18" fill="#D0E6D4" />
+          <circle cx="20" cy="20" r="12" fill="#F9FAF7" />
+          <circle cx="20" cy="20" r="6" fill="#74B58D" />
+          <path d="M20 6 L20 12 M20 28 L20 34 M6 20 L12 20 M28 20 L34 20" stroke="#29463A" stroke-width="1.2" opacity="0.3" />
+        </svg>
+        Stardust X
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#experience">Experience</a>
+      <a href="#about">About</a>
+      <a href="#download" class="cta-nav">Download App</a>
+    </div>
+    <div class="hamburger" id="hamburger" aria-label="menu">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <button class="close-drawer" id="closeDrawer">✕</button>
+  <a href="#home">Home</a>
+  <a href="#features">Features</a>
+  <a href="#experience">Experience</a>
+  <a href="#about">About</a>
+  <a href="#download" class="cta-nav" style="margin-top:8px;">Download App</a>
+</div>
+
+<!-- HERO -->
+<section id="home" class="hero" style="max-width:100%; padding-bottom:60px;">
+  <video autoplay muted loop playsinline class="hero-video" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23E2EFE4'/%3E%3C/svg%3E">
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-soft-light-leaves-3497.mp4" type="video/mp4" />
+    <!-- fallback: soft loop -->
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="float-orb"></div>
+  <div class="float-orb"></div>
+  <div class="float-orb"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">✦ STARDUST X</div>
+    <h1>Connect. <span>Chat.</span> Share.</h1>
+    <p>A beautifully simple messaging experience designed to keep you connected.</p>
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary">Download Stardust X</a>
+      <a href="#features" class="btn-secondary">Explore Features</a>
+    </div>
+    <div class="hero-sub-line">Fast • Simple • Private</div>
+  </div>
+</section>
+
+<!-- APP PREVIEW -->
+<section id="features">
+  <h2 class="section-title">Everything you need to stay connected.</h2>
+  <p class="section-sub">Real app screens, crafted for clarity.</p>
+  <div class="preview-grid">
+    <div class="phone-frame"><img src="https://placecats.com/200/400?random=1" alt="main chat" loading="lazy" /><span class="phone-caption">Main Chat</span></div>
+    <div class="phone-frame"><img src="https://placecats.com/200/401?random=2" alt="add contacts" loading="lazy" /><span class="phone-caption">Add Contacts</span></div>
+    <div class="phone-frame"><img src="https://placecats.com/200/402?random=3" alt="settings" loading="lazy" /><span class="phone-caption">Settings</span></div>
+    <div class="phone-frame"><img src="https://placecats.com/200/403?random=4" alt="chat with friend" loading="lazy" /><span class="phone-caption">Chat with Friend</span></div>
+  </div>
+</section>
+
+<!-- FEATURE CARDS (based on real app capabilities) -->
+<section style="padding-top:20px;">
+  <div class="feature-grid">
+    <div class="feature-card"><div class="emoji-big">💬</div><h3>Chat naturally</h3><p>Real‑time conversations with a clean, distraction‑free interface.</p></div>
+    <div class="feature-card"><div class="emoji-big">👥</div><h3>Find your people</h3><p>Elegant contact discovery, just a tap away.</p></div>
+    <div class="feature-card"><div class="emoji-big">🛠️</div><h3>Your app, your way</h3><p>Rich settings to tailor notifications, appearance, and privacy.</p></div>
+    <div class="feature-card"><div class="emoji-big">❤️</div><h3>Conversations that feel personal</h3><p>Expressive chat with friends, built for warmth.</p></div>
+  </div>
+</section>
+
+<!-- INTERACTIVE APP EXPERIENCE -->
+<section id="experience">
+  <h2 class="section-title">Designed for connection</h2>
+  <div class="interactive-row">
+    <div class="interactive-phone">
+      <img src="https://placecats.com/300/600?random=5" alt="chat screen" loading="lazy" />
+    </div>
+    <div class="interactive-desc">
+      <h3>Conversations that flow</h3>
+      <p>Every detail — from the soft mint accents to the smooth animations — feels like a natural extension of your day.</p>
+      <ul>
+        <li>✦ Seamless message sync</li>
+        <li>✦ Minimal, focused UI</li>
+        <li>✦ Your privacy, respected</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SPLASH SCREEN -->
+<section style="max-width:1000px;">
+  <div class="splash-section">
+    <div class="splash-curve"></div>
+    <div class="splash-curve splash-curve2"></div>
+    <h2 style="font-size:2rem;font-weight:450;color:var(--mint-dark);">Meet Stardust X</h2>
+    <p style="color:#3f5f50;margin-bottom:28px;">The splash screen that starts your journey.</p>
+    <img src="https://placecats.com/300/600?random=6" alt="splash screen" class="splash-phone" loading="lazy" />
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download" style="max-width:1000px;">
+  <div class="download-section">
+    <h2>Ready to experience Stardust X?</h2>
+    <p>Download Stardust X and start connecting.</p>
+    <div class="download-actions">
+      <a href="#" class="btn-primary" id="downloadApkBtn" style="padding:16px 52px;font-size:1.2rem;">Download APK</a>
+      <a href="#features" class="btn-secondary" style="padding:16px 36px;">Learn More</a>
+    </div>
+    <div style="margin-top:16px;font-size:0.85rem;color:#3f5f50;">v2.0.1 · 24 MB</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" style="padding-top:20px;">
+  <div class="about-mini">
+    <h2 style="font-size:1.8rem;font-weight:450;color:var(--mint-dark);margin-bottom:12px;">About Stardust X</h2>
+    <p>Stardust X is a modern messaging application built for clarity, speed, and genuine connection. With a soft mint visual language and an elegant orbital identity, we focus on what matters: your conversations.</p>
+    <p style="margin-top:16px;">— <a href="#" style="color:#74B58D;font-weight:450;">About Us</a></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span style="display:flex;align-items:center;gap:8px;">
+        <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
+          <circle cx="16" cy="16" r="14" fill="#D0E6D4" />
+          <circle cx="16" cy="16" r="9" fill="#F9FAF7" />
+          <circle cx="16" cy="16" r="5" fill="#74B58D" />
+        </svg>
+        Stardust X
+      </span>
+      <div style="font-weight:300;font-size:0.9rem;color:#4b6b5b;margin-top:4px;">Modern messaging, beautifully simple.</div>
+    </div>
+    <div class="footer-links">
+      <a href="#home">Home</a>
+      <a href="#features">Features</a>
+      <a href="#about">About</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Stardust X. All rights reserved.</div>
+</footer>
+
+<!-- JS: mobile drawer, download, scroll reveals -->
+<script>
+  (function() {
+    // mobile drawer
+    const hamburger = document.getElementById('hamburger');
+    const drawer = document.getElementById('mobileDrawer');
+    const closeBtn = document.getElementById('closeDrawer');
+    function toggleDrawer(open) {
+      drawer.classList.toggle('open', open);
+    }
+    hamburger.addEventListener('click', (e) => { e.stopPropagation(); toggleDrawer(true); });
+    closeBtn.addEventListener('click', () => toggleDrawer(false));
+    drawer.addEventListener('click', (e) => { if(e.target === drawer) toggleDrawer(false); });
+    document.querySelectorAll('.mobile-drawer a').forEach(link => link.addEventListener('click', () => toggleDrawer(false)));
+
+    // download APK (simulated)
+    document.getElementById('downloadApkBtn').addEventListener('click', function(e) {
+      e.preventDefault();
+      // In production: window.location.href = 'https://example.com/stardust-x.apk';
+      alert('🚀 Download started: Stardust X APK (simulated)');
+    });
+
+    // fade-up on scroll (simple intersection)
+    const faders = document.querySelectorAll('.fade-up');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.phone-frame, .feature-card, .interactive-row, .splash-section, .download-section, .about-mini').forEach(el => {
+      el.classList.add('fade-up');
+      observer.observe(el);
+    });
+    // also hero
+    document.querySelector('.hero-content')?.classList.add('fade-up');
+    observer.observe(document.querySelector('.hero-content'));
+
+    // nav blur on scroll
+    window.addEventListener('scroll', function() {
+      const nav = document.querySelector('nav');
+      if(window.scrollY > 40) {
+        nav.style.background = 'rgba(249, 250, 247, 0.8)';
+        nav.style.boxShadow = '0 4px 20px rgba(41,70,58,0.04)';
+      } else {
+        nav.style.background = 'rgba(249, 250, 247, 0.7)';
+        nav.style.boxShadow = 'none';
+      }
+    });
+  })();
+</script>
+
+<!-- note: assets are placeholder images – replace with actual screenshots -->
+</body>
+</html>
